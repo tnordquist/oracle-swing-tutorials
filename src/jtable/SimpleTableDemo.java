@@ -1,17 +1,20 @@
-package oracletutorial;/*
+package jtable;/*
  * oracletutorial.component.SimpleTableDemo.java requires no other files.
  */
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.EventObject;
 
-public class SimpleTableDemo extends JPanel {
+public class SimpleTableDemo extends JPanel implements TableModelListener {
     private boolean DEBUG = false;
 
     public SimpleTableDemo() {
@@ -39,6 +42,8 @@ public class SimpleTableDemo extends JPanel {
         final JTable table = new JTable(data, columnNames);
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
+
+        table.getModel().addTableModelListener(this);
 
         TableColumn column = null;
         for (int i = 0; i < 5; i++) {
@@ -120,5 +125,15 @@ public class SimpleTableDemo extends JPanel {
                 createAndShowGUI();
             }
         });
+    }
+
+    @Override
+    public void tableChanged(TableModelEvent event) {
+        int row = event.getFirstRow();
+        int column = event.getColumn();
+        TableModel model = (TableModel) event.getSource();
+        String columnName = model.getColumnName(column);
+        Object data = model.getValueAt(row, column);
+        model.isCellEditable(0, 1);
     }
 }
