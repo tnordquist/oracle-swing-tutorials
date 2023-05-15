@@ -1,4 +1,4 @@
-package oracletutorial;/*
+package jtable;/*
  * TableFTFEditDemo.java requires one other file:
  *   IntegerEditor.java
  */

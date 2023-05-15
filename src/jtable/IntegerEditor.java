@@ -1,4 +1,4 @@
-package oracletutorial;
+package jtable;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
