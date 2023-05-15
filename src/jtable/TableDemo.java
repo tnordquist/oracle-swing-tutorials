@@ -1,4 +1,4 @@
-package oracletutorial;
+package jtable;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -27,11 +27,21 @@ public class TableDemo extends JPanel {
 //            if ()
 //        });
 
-        //Create the scroll pane and add the table to it.
-        JScrollPane scrollPane = new JScrollPane(table);
+        /*
+        The scroll pane automatically places the table header at the top of the viewport.
+        The column names remain visible at the top of the viewing area when the table
+        data is scrolled. If you are using a table without a scroll pane, then you must
+        get the table header component and place it yourself
+         */
+        this.setLayout(new BorderLayout());
+        this.add(table.getTableHeader(), BorderLayout.PAGE_START);
+        this.add(table, BorderLayout.CENTER);
 
-        //Add the scroll pane to this panel.
-        add(scrollPane);
+//        //Create the scroll pane and add the table to it.
+//        JScrollPane scrollPane = new JScrollPane(table);
+//
+//        //Add the scroll pane to this panel.
+//        add(scrollPane);
     }
 
     class MyTableModel extends AbstractTableModel implements ActionListener {
