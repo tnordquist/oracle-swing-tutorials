@@ -2,12 +2,10 @@ package jtable;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 /**
  * oracletutorial.component.TableDemo is just like oracletutorial.component.SimpleTableDemo, except that it
@@ -32,18 +30,20 @@ public class TableRenderDemo extends JPanel {
         initColumnSizes(table);
 
         //Fiddle with the Sport column's cell editors/renderers.
-//        setUpSportColumn(table, table.getColumnModel().getColumn(2));
-        // TODO: Create the method implementation for this call.
+        setUpSportColumn(table, table.getColumnModel().getColumn(2));
+
 
         //Add the scroll pane to this panel.
         add(scrollPane);
     }
+
     /*
      * This method picks good column sizes.
      * If all column heads are wider than the column's cells'
      * contents, then you can just use column.sizeWidthToFit().
      */
-        private void initColumnSizes (JTable table){
+
+    private void initColumnSizes (JTable table){
             MyTableModel model = (MyTableModel) table.getModel();
             TableColumn column = null;
             Component comp = null;
@@ -75,6 +75,22 @@ public class TableRenderDemo extends JPanel {
             }
         }
 
+    private void setUpSportColumn(JTable table, TableColumn sportColumn) {
+
+        //Set up the editor for the sport cells.
+        JComboBox<String> comboBox = new JComboBox<String>();
+        comboBox.addItem("Snowboarding");
+        comboBox.addItem("Knitting");
+        comboBox.addItem("Speed reading");
+        comboBox.addItem("Pool");
+        comboBox.addItem("None of the above");
+        sportColumn.setCellEditor(new DefaultCellEditor(comboBox));
+
+        //Set up tool tips for the sport cells.
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        renderer.setToolTipText("Click for combo box");
+        sportColumn.setCellRenderer(renderer);
+    }
 
     class MyTableModel extends AbstractTableModel {
 
@@ -178,17 +194,17 @@ public class TableRenderDemo extends JPanel {
     }
 
     /**
-     * Create the GUI and show it.  For thread safety,
+     * Create the GUI and show it. For thread safety,
      * this method should be invoked from the
      * event-dispatching thread.
      */
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame("oracletutorial.TableDemo");
+        JFrame frame = new JFrame("TableRenderDemo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create and set up the content pane.
-        TableDemo newContentPane = new TableDemo();
+        TableRenderDemo newContentPane = new TableRenderDemo();
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
 
