@@ -1,69 +1,69 @@
 package jtable;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-
-/** 
- * oracletutorial.component.TableDemo is just like oracletutorial.component.SimpleTableDemo, except that it
- * uses a custom TableModel.
+/*
+ * TableDialogEditDemo.java requires these files:
+ *   ColorRenderer.java
+ *   ColorEditor.java
  */
-public class TableDemo extends JPanel {
-    private boolean DEBUG = false;
-    private static final int MASK =
-            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-    public TableDemo() {
+
+import jtable.components.ColorEditor;
+import jtable.components.ColorRenderer;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+
+/**
+ * This is like TableDemo, except that it substitutes a
+ * Favorite Color column for the Last Name column and specifies
+ * a custom cell renderer and editor for the color data.
+ */
+public class TableDialogEditDemo extends JPanel {
+    private boolean DEBUG = true;
+
+    public TableDialogEditDemo() {
         super(new GridLayout(1,0));
 
         JTable table = new JTable(new MyTableModel());
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
-        table.getInputMap().put(KeyStroke.getKeyStroke(
-                KeyEvent.VK_DELETE, 0), "delete");
-//        table.getActionMap().put("delete", (AbstractAction) (e) -> {
-//            if ()
-//        });
 
-        /*
-        The scroll pane automatically places the table header at the top of the viewport.
-        The column names remain visible at the top of the viewing area when the table
-        data is scrolled. If you are using a table without a scroll pane, then you must
-        get the table header component and place it yourself
-         */
-        this.setLayout(new BorderLayout());
-        this.add(table.getTableHeader(), BorderLayout.PAGE_START);
-        this.add(table, BorderLayout.CENTER);
+        //Create the scroll pane and add the table to it.
+        JScrollPane scrollPane = new JScrollPane(table);
 
-//        //Create the scroll pane and add the table to it.
-//        JScrollPane scrollPane = new JScrollPane(table);
-//
-//        //Add the scroll pane to this panel.
-//        add(scrollPane);
+        //Set up renderer and editor for the Favorite Color column.
+        table.setDefaultRenderer(Color.class,
+                                 new ColorRenderer(true));
+        table.setDefaultEditor(Color.class,
+                               new ColorEditor());
+
+        //Add the scroll pane to this panel.
+        add(scrollPane);
     }
 
-
-
-    class MyTableModel extends AbstractTableModel implements ActionListener {
-
+    class MyTableModel extends AbstractTableModel {
         private String[] columnNames = {"First Name",
-                                        "Last Name",
+                                        "Favorite Color",
                                         "Sport",
                                         "# of Years",
                                         "Vegetarian"};
         private Object[][] data = {
-                {"Kathy", "Smith",
-                        "Snowboarding", 5, false},
-                {"John", "Doe",
-                        "Rowing", 3, true},
-                {"Sue", "Black",
-                        "Knitting", 2, false},
-                {"Jane", "White",
-                        "Speed reading", 20, true},
-                {"Joe", "Brown",
-                        "Pool", 10, false}
+            {"Mary", new Color(153, 0, 153),
+             "Snowboarding", new Integer(5), new Boolean(false)},
+            {"Alison", new Color(51, 51, 153),
+             "Rowing", new Integer(3), new Boolean(true)},
+            {"Kathy", new Color(51, 102, 51),
+             "Knitting", new Integer(2), new Boolean(false)},
+            {"Sharon", Color.red,
+             "Speed reading", new Integer(20), new Boolean(true)},
+            {"Philip", Color.pink,
+             "Pool", new Integer(10), new Boolean(false)}
         };
 
         public int getColumnCount() {
@@ -92,24 +92,16 @@ public class TableDemo extends JPanel {
             return getValueAt(0, c).getClass();
         }
 
-        /*
-         * Don't need to implement this method unless your table's
-         * editable.
-         */
         public boolean isCellEditable(int row, int col) {
             //Note that the data/cell address is constant,
             //no matter where the cell appears onscreen.
-            if (col < 2) {
+            if (col < 1) {
                 return false;
             } else {
                 return true;
             }
         }
 
-        /*
-         * Don't need to implement this method unless your table's
-         * data can change.
-         */
         public void setValueAt(Object value, int row, int col) {
             if (DEBUG) {
                 System.out.println("Setting value at " + row + "," + col
@@ -140,11 +132,6 @@ public class TableDemo extends JPanel {
             }
             System.out.println("--------------------------");
         }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-
-        }
     }
 
     /**
@@ -154,11 +141,11 @@ public class TableDemo extends JPanel {
      */
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame("oracletutorial.TableDemo");
+        JFrame frame = new JFrame("TableDialogEditDemo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create and set up the content pane.
-        TableDemo newContentPane = new TableDemo();
+        JComponent newContentPane = new TableDialogEditDemo();
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
 
@@ -167,15 +154,6 @@ public class TableDemo extends JPanel {
         frame.setVisible(true);
     }
 
-//    private void addKeyBindings() {
-//        //root maps
-//        InputMap im = this.getRootPane().getInputMap(
-//                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-//        ActionMap am = this.getRootPane().getActionMap();
-//        //add custom action
-//        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, MASK), "delete");
-//        am.put("delete", saveAction());
-//    }
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.

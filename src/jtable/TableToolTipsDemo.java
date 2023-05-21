@@ -2,57 +2,103 @@ package jtable;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
-/** 
- * oracletutorial.component.TableDemo is just like oracletutorial.component.SimpleTableDemo, except that it
- * uses a custom TableModel.
+/**
+ * TableToolTipsDemo is just like TableDemo except that it
+ * sets up tool tips for both cells and column headers.
  */
-public class TableDemo extends JPanel {
+public class TableToolTipsDemo extends JPanel {
     private boolean DEBUG = false;
-    private static final int MASK =
-            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-    public TableDemo() {
-        super(new GridLayout(1,0));
+    protected String[] columnToolTips = {null,
+            null,
+            "The person's favorite sport to participate in",
+            "The number of years the person has played the sport",
+            "If checked, the person eats no meat"};
 
-        JTable table = new JTable(new MyTableModel());
+    public TableToolTipsDemo() {
+        super(new GridLayout(1, 0));
+
+        JTable table = new JTable(new MyTableModel()) {
+
+            //Implement table cell tool tips.
+            public String getToolTipText(MouseEvent event) {
+                String tip = null;
+                Point p = event.getPoint();
+                int rowIndex = rowAtPoint(p);
+                int colIndex = columnAtPoint(p);
+                int realColumnIndex = convertColumnIndexToModel(colIndex);
+
+                if (realColumnIndex == 2) { //Currently the Sport column
+                    tip = "This person's favorite sport to participate in is: "
+                            + getValueAt(rowIndex, colIndex);
+                } else if (realColumnIndex == 4) { //Veggie column
+                    TableModel model = getModel();
+                    String firstName = (String) model.getValueAt(rowIndex, 0);
+                    String lastName = (String) model.getValueAt(rowIndex, 1);
+                    Boolean veggie = (Boolean) model.getValueAt(rowIndex, 4);
+                    if (Boolean.TRUE.equals(veggie)) {
+                        tip = firstName + " " + lastName
+                                + " is a vegetarian";
+                    } else {
+                        tip = firstName + " " + lastName
+                                + " is not a vegetarian";
+                    }
+                } else {
+                    //You can omit this part if you know you don't
+                    //have any renderers that supply their own tool
+                    //tips.
+                    tip = super.getToolTipText(event);
+                }
+                return tip;
+            }
+
+            //Implement table header tool tips.
+            protected JTableHeader createDefaultTableHeader() {
+                return new JTableHeader(this.columnModel) {
+                    public String getToolTipText(MouseEvent event) {
+                    String tip = null;
+                        Point p = event.getPoint();
+                        int index = columnModel.getColumnIndexAtX(p.x);
+                        int realIndex = columnModel.getColumn(index).getModelIndex();
+                        return columnToolTips[realIndex];
+                    }
+                };
+            }
+        };
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
-        table.getInputMap().put(KeyStroke.getKeyStroke(
-                KeyEvent.VK_DELETE, 0), "delete");
-//        table.getActionMap().put("delete", (AbstractAction) (e) -> {
-//            if ()
-//        });
-
         /*
         The scroll pane automatically places the table header at the top of the viewport.
         The column names remain visible at the top of the viewing area when the table
         data is scrolled. If you are using a table without a scroll pane, then you must
         get the table header component and place it yourself
          */
-        this.setLayout(new BorderLayout());
-        this.add(table.getTableHeader(), BorderLayout.PAGE_START);
-        this.add(table, BorderLayout.CENTER);
+//        this.setLayout(new BorderLayout());
+//        this.add(table.getTableHeader(),BorderLayout.PAGE_START);
+//        this.add(table, BorderLayout.CENTER);
 
-//        //Create the scroll pane and add the table to it.
-//        JScrollPane scrollPane = new JScrollPane(table);
-//
-//        //Add the scroll pane to this panel.
-//        add(scrollPane);
+        //Create the scroll pane and add the table to it.
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        //Add the scroll pane to this panel.
+        add(scrollPane);
     }
 
 
-
-    class MyTableModel extends AbstractTableModel implements ActionListener {
+    class MyTableModel extends AbstractTableModel  {
 
         private String[] columnNames = {"First Name",
-                                        "Last Name",
-                                        "Sport",
-                                        "# of Years",
-                                        "Vegetarian"};
+                "Last Name",
+                "Sport",
+                "# of Years",
+                "Vegetarian"};
         private Object[][] data = {
                 {"Kathy", "Smith",
                         "Snowboarding", 5, false},
@@ -113,9 +159,9 @@ public class TableDemo extends JPanel {
         public void setValueAt(Object value, int row, int col) {
             if (DEBUG) {
                 System.out.println("Setting value at " + row + "," + col
-                                   + " to " + value
-                                   + " (an instance of "
-                                   + value.getClass() + ")");
+                        + " to " + value
+                        + " (an instance of "
+                        + value.getClass() + ")");
             }
 
             data[row][col] = value;
@@ -131,19 +177,14 @@ public class TableDemo extends JPanel {
             int numRows = getRowCount();
             int numCols = getColumnCount();
 
-            for (int i=0; i < numRows; i++) {
+            for (int i = 0; i < numRows; i++) {
                 System.out.print("    row " + i + ":");
-                for (int j=0; j < numCols; j++) {
+                for (int j = 0; j < numCols; j++) {
                     System.out.print("  " + data[i][j]);
                 }
                 System.out.println();
             }
             System.out.println("--------------------------");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-
         }
     }
 
@@ -154,11 +195,11 @@ public class TableDemo extends JPanel {
      */
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame("oracletutorial.TableDemo");
+        JFrame frame = new JFrame("TableToolTipsDemo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create and set up the content pane.
-        TableDemo newContentPane = new TableDemo();
+        JComponent newContentPane = new TableToolTipsDemo();
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
 
@@ -167,7 +208,7 @@ public class TableDemo extends JPanel {
         frame.setVisible(true);
     }
 
-//    private void addKeyBindings() {
+    //    private void addKeyBindings() {
 //        //root maps
 //        InputMap im = this.getRootPane().getInputMap(
 //                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
