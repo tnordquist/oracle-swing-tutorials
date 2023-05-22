@@ -8,8 +8,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
-/** 
+/**
  * oracletutorial.component.TableDemo is just like oracletutorial.component.SimpleTableDemo, except that it
  * uses a custom TableModel.
  */
@@ -17,8 +19,9 @@ public class TableSortDemo extends JPanel {
     private boolean DEBUG = false;
     private static final int MASK =
             Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
     public TableSortDemo() {
-        super(new GridLayout(1,0));
+        super(new GridLayout(1, 0));
 
         JTable table = new JTable(new MyTableModel());
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
@@ -26,6 +29,12 @@ public class TableSortDemo extends JPanel {
 //        table.setAutoCreateRowSorter(true);
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
         table.setRowSorter(sorter);
+
+        // Specify the sort order and sort precedence for columns
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        sorter.setSortKeys(sortKeys);
 
         //Create the scroll pane and add the table to it.
         JScrollPane scrollPane = new JScrollPane(table);
@@ -35,14 +44,13 @@ public class TableSortDemo extends JPanel {
     }
 
 
-
     class MyTableModel extends AbstractTableModel {
 
         private String[] columnNames = {"First Name",
-                                        "Last Name",
-                                        "Sport",
-                                        "# of Years",
-                                        "Vegetarian"};
+                "Last Name",
+                "Sport",
+                "# of Years",
+                "Vegetarian"};
         private Object[][] data = {
                 {"Kathy", "Smith",
                         "Snowboarding", 5, false},
@@ -50,10 +58,12 @@ public class TableSortDemo extends JPanel {
                         "Rowing", 3, true},
                 {"Sue", "Black",
                         "Knitting", 2, false},
+                {"Zoey", "Brown",
+                        "Pool", 10, false},
                 {"Jane", "White",
                         "Speed reading", 20, true},
                 {"Joe", "Brown",
-                        "Pool", 10, false}
+                        "Pool", 10, false},
         };
 
         public int getColumnCount() {
@@ -103,9 +113,9 @@ public class TableSortDemo extends JPanel {
         public void setValueAt(Object value, int row, int col) {
             if (DEBUG) {
                 System.out.println("Setting value at " + row + "," + col
-                                   + " to " + value
-                                   + " (an instance of "
-                                   + value.getClass() + ")");
+                        + " to " + value
+                        + " (an instance of "
+                        + value.getClass() + ")");
             }
 
             data[row][col] = value;
@@ -129,9 +139,9 @@ public class TableSortDemo extends JPanel {
             int numRows = getRowCount();
             int numCols = getColumnCount();
 
-            for (int i=0; i < numRows; i++) {
+            for (int i = 0; i < numRows; i++) {
                 System.out.print("    row " + i + ":");
-                for (int j=0; j < numCols; j++) {
+                for (int j = 0; j < numCols; j++) {
                     System.out.print("  " + data[i][j]);
                 }
                 System.out.println();
