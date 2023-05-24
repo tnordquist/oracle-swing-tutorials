@@ -7,17 +7,25 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * oracletutorial.component.TableDemo is just like oracletutorial.component.SimpleTableDemo, except that it
  * uses a custom TableModel.
  */
 public class TableFilterDemo extends JPanel {
+    private boolean DEBUG = false;
+    private JTable table;
+    private JTextField filterText;
+    private JTextField statusText;
+    private TableRowSorter<MyTableModel> sorter;
 
     public TableFilterDemo() {
-        super(new GridLayout(1, 0));
+        super();
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        JTable table = new JTable(new MyTableModel());
+        table = new JTable(new MyTableModel());
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
 //        table.setAutoCreateRowSorter(true);
@@ -35,8 +43,28 @@ public class TableFilterDemo extends JPanel {
 
         //Add the scroll pane to this panel.
         add(scrollPane);
+
+        //Create a separate form for filterText and statusText
+        JPanel form = new JPanel(new SpringLayout());
+        JLabel l1 = new JLabel("Filter Text:", SwingConstants.TRAILING);
+        form.add(l1);
     }
 
+
+    /**
+     * Update the row filter regular expression from the expression in
+     * the text box.
+     */
+    private void newFilter() {
+        RowFilter<MyTableModel, Object> rf = null;
+        //If current expression doesn't parse, don't update.
+        try {
+            rf = RowFilter.regexFilter(filterText.getText(),0);
+        } catch (PatternSyntaxException e) {
+            return;
+        }
+        sorter.setRowFilter(rf);
+    }
 
     static class MyTableModel extends AbstractTableModel {
 
