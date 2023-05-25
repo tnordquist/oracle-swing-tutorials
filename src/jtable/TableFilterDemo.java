@@ -1,21 +1,21 @@
 package jtable;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * oracletutorial.component.TableDemo is just like oracletutorial.component.SimpleTableDemo, except that it
- * uses a custom TableModel.
+ * TableFilterDemo.java requires SpringUtilities.java
  */
 public class TableFilterDemo extends JPanel {
-    private boolean DEBUG = false;
+    private final boolean DEBUG = false;
     private JTable table;
     private JTextField filterText;
     private JTextField statusText;
@@ -25,12 +25,17 @@ public class TableFilterDemo extends JPanel {
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        table = new JTable(new MyTableModel());
+        // Create a table with a sorter
+        MyTableModel model = new MyTableModel();
+        sorter = new TableRowSorter<>(model);
+        table = new JTable(model);
+        table.setRowSorter(sorter);
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
-//        table.setAutoCreateRowSorter(true);
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
-        table.setRowSorter(sorter);
+
+        //For the purposes of this example, better to have a single
+        //selection.
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Specify the sort order and sort precedence for columns
         List<RowSorter.SortKey> sortKeys = new ArrayList<>();
@@ -66,7 +71,7 @@ public class TableFilterDemo extends JPanel {
         sorter.setRowFilter(rf);
     }
 
-    static class MyTableModel extends AbstractTableModel {
+     class MyTableModel extends AbstractTableModel {
 
         private final String[] columnNames = {"First Name",
                 "Last Name",
