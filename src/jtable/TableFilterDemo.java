@@ -3,17 +3,11 @@ package jtable;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.Dimension;
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
-/**
- * TableFilterDemo.java requires SpringUtilities.java
- */
 public class TableFilterDemo extends JPanel {
     private final boolean DEBUG = false;
     private JTable table;
@@ -37,11 +31,24 @@ public class TableFilterDemo extends JPanel {
         //selection.
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Specify the sort order and sort precedence for columns
-        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-        sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-        sorter.setSortKeys(sortKeys);
+        //When selection changes, provide user with row numbers for
+        //both view and model.
+        table.getSelectionModel().addListSelectionListener(
+                new ListSelectionListener() {
+                    @Override
+                    public void valueChanged(ListSelectionEvent event) {
+                        int viewRow = table.getSelectedRow();
+                        if (viewRow < 0) {
+                            //Selection got filtered away.
+                            statusText.setText("");
+                        } else {
+                            int modelRow = table.convertRowIndexToModel(viewRow);
+                            statusText.setText(String.format("Selected Row in view: %d. "
+                            + "Selected Row in model: %d", viewRow, modelRow));
+                        }
+                    }
+                }
+        );
 
         //Create the scroll pane and add the table to it.
         JScrollPane scrollPane = new JScrollPane(table);
@@ -53,6 +60,26 @@ public class TableFilterDemo extends JPanel {
         JPanel form = new JPanel(new SpringLayout());
         JLabel l1 = new JLabel("Filter Text:", SwingConstants.TRAILING);
         form.add(l1);
+        filterText = new JTextField();
+        //Whenever filterText changes, invoke newFilter.
+        filterText.getDocument().addDocumentListener(
+                new DocumentListener() {
+                    @Override
+                    public void insertUpdate(DocumentEvent e) {
+                        newFilter();
+                    }
+
+                    @Override
+                    public void removeUpdate(DocumentEvent e) {
+                        newFilter();
+                    }
+
+                    @Override
+                    public void changedUpdate(DocumentEvent e) {
+                        newFilter();
+                    }
+                });
+        l1.setLabelFor(filterText);
     }
 
 
@@ -171,11 +198,11 @@ public class TableFilterDemo extends JPanel {
      */
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame("TableSortDemo");
+        JFrame frame = new JFrame("TableFilterDemo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create and set up the content pane.
-        TableSortDemo newContentPane = new TableSortDemo();
+        TableFilterDemo newContentPane = new TableFilterDemo();
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
 
@@ -187,6 +214,11 @@ public class TableFilterDemo extends JPanel {
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(TableFilterDemo::createAndShowGUI);
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                createAndShowGUI();
+            }
+        });
     }
 }
