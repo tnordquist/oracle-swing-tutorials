@@ -1,5 +1,7 @@
 package jtable;
 
+import layout.SpringUtilities;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
@@ -10,9 +12,9 @@ import java.util.regex.PatternSyntaxException;
 
 public class TableFilterDemo extends JPanel {
     private final boolean DEBUG = false;
-    private JTable table;
-    private JTextField filterText;
-    private JTextField statusText;
+    private  JTable table;
+    private  JTextField filterText;
+    private  JTextField statusText;
     private TableRowSorter<MyTableModel> sorter;
 
     public TableFilterDemo() {
@@ -44,7 +46,7 @@ public class TableFilterDemo extends JPanel {
                         } else {
                             int modelRow = table.convertRowIndexToModel(viewRow);
                             statusText.setText(String.format("Selected Row in view: %d. "
-                            + "Selected Row in model: %d", viewRow, modelRow));
+                            + "Selected Row in model: %d.", viewRow, modelRow));
                         }
                     }
                 }
@@ -80,6 +82,14 @@ public class TableFilterDemo extends JPanel {
                     }
                 });
         l1.setLabelFor(filterText);
+        form.add(filterText);
+        JLabel l2 = new JLabel("Status:", SwingConstants.TRAILING);
+        form.add(l2);
+        statusText = new JTextField();
+        l2.setLabelFor(statusText);
+        form.add(statusText);
+        SpringUtilities.makeCompactGrid(form, 2, 2, 6, 6, 6, 6);
+        add(form);
     }
 
 
@@ -161,6 +171,12 @@ public class TableFilterDemo extends JPanel {
          * data can change.
          */
         public void setValueAt(Object value, int row, int col) {
+            if (DEBUG) {
+                System.out.println("Setting value at " + row + "," + col
+                                   + " to " + value
+                                   + " (an instance of "
+                                   + value.getClass() + ")");
+            }
 
             data[row][col] = value;
             // Normally, one should call fireTableCellUpdated() when
@@ -171,8 +187,12 @@ public class TableFilterDemo extends JPanel {
             // when they shouldn't be.  Ideally, TableSorter should be
             // given a more intelligent tableChanged() implementation,
             // and then the following line can be uncommented.
-            // fireTableCellUpdated(row, col);
+             fireTableCellUpdated(row, col);
 
+            if (DEBUG) {
+                System.out.println("New value of data:");
+                printDebugData();
+            }
         }
 
         private void printDebugData() {
